@@ -1,10 +1,10 @@
-function E () {
+function E() {
   // Keep this empty so it's easier to inherit from
   // (via https://github.com/lipsmack from https://github.com/scottcorgan/tiny-emitter/issues/3)
 }
 
 E.prototype = {
-  on: function (name, callback, ctx) {
+  on: function(name, callback, ctx) {
     var e = this.e || (this.e = {});
 
     (e[name] || (e[name] = [])).push({
@@ -15,18 +15,18 @@ E.prototype = {
     return this;
   },
 
-  once: function (name, callback, ctx) {
+  once: function(name, callback, ctx) {
     var self = this;
-    function listener () {
+    function listener() {
       self.off(name, listener);
       callback.apply(ctx, arguments);
-    };
+    }
 
-    listener._ = callback
+    listener._ = callback;
     return this.on(name, listener, ctx);
   },
 
-  emit: function (name) {
+  emit: function(name) {
     var data = [].slice.call(arguments, 1);
     var evtArr = ((this.e || (this.e = {}))[name] || []).slice();
     var i = 0;
@@ -39,7 +39,13 @@ E.prototype = {
     return this;
   },
 
-  off: function (name, callback) {
+  dispatchEvent: function(ev) {
+    var name = ev.type;
+    console.log("DISPATCH!", name, ev);
+    this.emit(name, ev);
+  },
+
+  off: function(name, callback) {
     var e = this.e || (this.e = {});
     var evts = e[name];
     var liveEvents = [];
@@ -55,12 +61,13 @@ E.prototype = {
     // Suggested by https://github.com/lazd
     // Ref: https://github.com/scottcorgan/tiny-emitter/commit/c6ebfaa9bc973b33d110a84a307742b7cf94c953#commitcomment-5024910
 
-    (liveEvents.length)
-      ? e[name] = liveEvents
-      : delete e[name];
+    liveEvents.length ? (e[name] = liveEvents) : delete e[name];
 
     return this;
   }
 };
+
+E.prototype.addEventListener = E.prototype.on;
+E.prototype.removeEventListener = E.prototype.off;
 
 module.exports = E;
