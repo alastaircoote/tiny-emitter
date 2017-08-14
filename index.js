@@ -41,7 +41,6 @@ E.prototype = {
 
   dispatchEvent: function(ev) {
     var name = ev.type;
-    console.log("DISPATCH!", name, ev);
     this.emit(name, ev);
   },
 
